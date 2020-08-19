@@ -26,7 +26,7 @@ def make_prediction():
 
 st.title(body='Predict Iris Species')
 
-data=pd.read_csv(r'F:/kaggle/mlprojects/iris-specie-predictor/iris.csv',
+data=pd.read_csv(r'https://raw.githubusercontent.com/kunalgupta2616/Iris-Specie-Predictor/master/Iris.csv',
                 usecols=['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm','Species'])
 x= data.iloc[:,:-1].values
 y=data.iloc[:,-1].values
