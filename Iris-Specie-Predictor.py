@@ -12,6 +12,7 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 import plotly.express as px
+from sklearn.cluster import KMeans
 
 
 def confusion(test_y,pred_y):
@@ -20,9 +21,6 @@ def confusion(test_y,pred_y):
     return mat
 
 
-
-def make_prediction():
-    pass
 
 st.title(body='Predict Iris Species')
 
@@ -38,6 +36,7 @@ if show_data:
 st.subheader("Data Information")
 st.write("Number of Rows :",data.shape[0])
 st.write("Number of Columns :",data.shape[1])
+st.subheader("Description Report")
 st.dataframe(data.describe())
 
 from sklearn.preprocessing import LabelEncoder 
@@ -45,7 +44,7 @@ ly = LabelEncoder()
 y = ly.fit_transform(y)
 
 
-Model = st.sidebar.selectbox('Select Classifier Model',['Logistic Regression','SVM','NB Classifier','Decision Tree Classifier'])
+Model = st.sidebar.selectbox('Select Model/Algorithm',['Logistic Regression','SVM','NB Classifier','Decision Tree Classifier','KMeans Clustering'])
 
 def hyperparameters(Model):
     params={}
@@ -66,12 +65,15 @@ def hyperparameters(Model):
     elif Model=="NB Classifier":
         params={}
         st.sidebar.text("Using Default Hyperparameters.")
-    else:
+    elif Model=="Decision Tree Classifier":
         params={}
         max_depth = st.sidebar.slider("Maximum Depth of Tree",min_value=1)
         random_state = st.sidebar.text_input("Random State",value=0)
         params['max_depth']=max_depth
         params['random_state']=int(random_state)
+    else:
+        K = st.sidebar.slider("Number of Clusters",1,10)
+        params['n_clusters']=int(K)
     return params
 
 
@@ -90,34 +92,41 @@ def classifier(Model,params):
     elif Model=='NB Classifier':
         st.header('Gaussian Naive Bayes Classifier')
         clf = GaussianNB()
-    else:
+    elif Model=="Decision Tree Classifier":
         st.header('Decision Tree Classifier')
         clf = DecisionTreeClassifier(**params)
+    else:
+        st.header('KMeans Clustering')
+        clf = KMeans(**params)
     return clf
+
 clf = classifier(Model,params)
 
 from sklearn.model_selection import train_test_split
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2)
 
+if Model =='KMeans Clustering':
+    clf.fit(x)
+else:
+    clf.fit(x_train,y_train)
+    y_pred = clf.predict(x_test)
 
-clf.fit(x_train,y_train)
-y_pred = clf.predict(x_test)
+    st.header("Evaluation Metrics")
+    acc = accuracy_score(y_test,y_pred)
+    st.subheader(f"Accuracy Score :")
+    st.write(acc)
 
+    prec = precision_score(y_test,y_pred,average=None)
+    st.subheader(f"Precision Score : ")
+    st.write(prec)
 
-st.header("Evaluation Metrics")
-acc = accuracy_score(y_test,y_pred)
-st.subheader(f"Accuracy Score : {acc}")
+    st.subheader("Confusion Matrix :")
+    mat = confusion(y_test,y_pred)
+    st.write(mat)
 
-prec = precision_score(y_test,y_pred,average=None)
-st.subheader(f"Precision Score : {prec}")
-
-st.subheader("Confusion Matrix :")
-mat = confusion(y_test,y_pred)
-st.write(mat)
-
-st.subheader("Classification Report :")
-report = classification_report(y_test, y_pred,output_dict=True,target_names=['Setosa','Versicolour','Virginica'])
-st.dataframe(report)
+    st.subheader("Classification Report :")
+    report = classification_report(y_test, y_pred,output_dict=True,target_names=['Setosa','Versicolour','Virginica'])
+    st.dataframe(report)
 
 def visualizations(Model):
     st.header("Visualizations")
@@ -129,6 +138,13 @@ def visualizations(Model):
     st.success("Visualizations generated successfully.")
     st.plotly_chart(fig)
     
+    if Model == 'KMeans Clustering':
+        scores = [KMeans(n_clusters=i+1).fit(x).inertia_ 
+                for i in range(0,10)]
+        no_of_clusters = np.arange(1,11)
+        fig1 = px.line(x=no_of_clusters, y=scores, title="<h2>Elbow Method<h2> <br>Inertia of k-Means versus number of clusters")
+        fig1.update_layout(xaxis_title_text='Number of clusters',yaxis_title_text='Sum_of_squared_distances or Inertia',width=900,height=500)
+        st.plotly_chart(fig1)
 
     if Model=='Decision Tree Classifier':
         img_url = r"https://raw.githubusercontent.com/kunalgupta2616/TSF-Internship-Tasks/1b61f9487c4863e1e1a193082965efbda72fd2bd/iris_dectree_dtreeviz.svg"
