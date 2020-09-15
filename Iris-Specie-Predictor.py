@@ -14,6 +14,18 @@ from sklearn.metrics import confusion_matrix
 import plotly.express as px
 from sklearn.cluster import KMeans
 
+page_bg_img = '''
+<style>
+body {
+background-image: url("https://github.com/kunalgupta2616/Iris-Specie-Predictor/blob/master/iris.jpg?raw=true");
+background-size: cover;
+}
+</style>
+'''
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+
 
 def confusion(test_y,pred_y):
     from sklearn.metrics import confusion_matrix
@@ -142,7 +154,7 @@ def visualizations(Model):
         scores = [KMeans(n_clusters=i+1).fit(x).inertia_ 
                 for i in range(0,10)]
         no_of_clusters = np.arange(1,11)
-        fig1 = px.line(x=no_of_clusters, y=scores, title="<h2>Elbow Method<h2> <br>Inertia of k-Means versus number of clusters")
+        fig1 = px.line(x=no_of_clusters, y=scores, title="Elbow Method <br>Inertia of k-Means versus number of clusters")
         fig1.update_layout(xaxis_title_text='Number of clusters',yaxis_title_text='Sum_of_squared_distances or Inertia',width=900,height=500)
         st.plotly_chart(fig1)
 
