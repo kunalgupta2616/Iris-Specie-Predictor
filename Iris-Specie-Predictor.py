@@ -17,7 +17,7 @@ from sklearn.cluster import KMeans
 page_bg_img = '''
 <style>
 body {
-background-image: url("https://github.com/kunalgupta2616/Iris-Specie-Predictor/blob/master/iris.jpg?raw=true");
+background-image: url("https://github.com/kunalgupta2616/Iris-Specie-Predictor/blob/master/pexels-jessica-lewis-1118432.jpg?raw=true");
 background-size: cover;
 }
 </style>
