@@ -14,16 +14,8 @@ from sklearn.metrics import confusion_matrix
 import plotly.express as px
 from sklearn.cluster import KMeans
 
-page_bg_img = '''
-<style>
-body {
-background-image: url("https://github.com/kunalgupta2616/Iris-Specie-Predictor/blob/master/pexels-jessica-lewis-1118432.jpg?raw=true");
-background-size: cover;
-}
-</style>
-'''
 
-st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 
 
